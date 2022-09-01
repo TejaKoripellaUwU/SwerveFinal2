@@ -7,6 +7,8 @@
 
 package frc.robot;
 
+import com.revrobotics.CANSparkMax;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants.  This class should not be used for any other purpose.  All constants should be
@@ -21,7 +23,8 @@ public final class Constants {
     public static final double swerveModuleYDistance = 0.381;
 
     public static final double maxSpeed = 12.0;
-
+    public static final double wheelBaseX = 8;
+    public static final double wheelBaseY = 9;
     //Encoders
     public static final double angleEncoderConversionFactor = 20.00960392;
     public static final double driveEncoderConversionFactor = 1;
@@ -37,29 +40,22 @@ public final class Constants {
     public static final double deadzone = 0.05;
 
     //SPARK ids
-
-    // front left steer fixed
-    public static final int frontLeftSteer = 13;
-
-    //front left drive fixed
-    public static final int frontLeftDrive = 12;
+    public static final int frontLeftSteer = 16;
+    public static final int frontLeftDrive = 17;
     
-    // front right steer fixed
-    public static final int frontRightSteer = 4;
+    public static final int frontRightSteer = 12;
+    public static final int frontRightDrive = 10;
 
-    //front right drive fixed
-    public static final int frontRightDrive = 1;
+    public static final int rearLeftSteer = 11;
+    public static final int rearLeftDrive = 13;
 
-    //rear left steer fixed
-    public static final int rearLeftSteer = 2;
+    public static final int rearRightSteer = 15;
+    public static final int rearRightDrive = 14;
+    public static final double kRotP = 0.005;
 
-    // rear left drive fixed
-    public static final int rearLeftDrive = 3;
+    //TEJA IS COOL
 
-    // rear right steer fixed
-    public static final int rearRightSteer = 14;
-
-    // rear right drive fixed
-    public static final int rearRightDrive = 15;
+    //Change this
+    public static int rotJoystickPort = 1;
+    public static int transJoystickPort = 2;
 }
-

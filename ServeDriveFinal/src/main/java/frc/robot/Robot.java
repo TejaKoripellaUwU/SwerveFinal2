@@ -58,15 +58,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-    if (m_robotContainer.swerve.getReset()) {
-      for (SwerveModule module : m_robotContainer.swerve.getModules()) {
-        module.resetAngle();
-      }
-    }
 
-    if (m_robotContainer.swerve.getGyroReset()) {
-      m_robotContainer.swerve.resetGyro();
-    }
   }
 
   /**
