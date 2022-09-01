@@ -17,13 +17,13 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 import edu.wpi.first.math.util.Units;
 
-
+import java.util.concurrent.TimeUnit;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-
 
 
 import com.kauailabs.navx.frc.AHRS;
@@ -43,6 +43,7 @@ public class SwerveSubsystem extends SubsystemBase {
   private final double trackLength = Units.inchesToMeters(Constants.wheelBaseY);
   private final Joystick transJoystick;
   private final Joystick rotJoystick;
+  private ChassisSpeeds chassisSpeeds;
   private final edu.wpi.first.math.kinematics.SwerveDriveKinematics m_kinematics;
   AHRS navx = new AHRS(Port.kMXP);
 
@@ -63,8 +64,7 @@ public class SwerveSubsystem extends SubsystemBase {
     System.out.println("x: " + x);
     System.out.println("Y: " + y);
     System.out.println("ROT: " + rot);
-    
-    //Deadzones
+
     if (Math.abs(x)<Constants.deadzone){
       x = 0;
     }
@@ -79,8 +79,9 @@ public class SwerveSubsystem extends SubsystemBase {
     x= x*Constants.maxSpeed;
     y= y*Constants.maxSpeed;
     rot = rot*Constants.maxSpeed;
-
-
+    chassisSpeeds = new ChassisSpeeds(x, y, rot);
+    SwerveModuleState[] moduleStates = m_kinematics.toSwerveModuleStates(chassisSpeeds);
+    this.setModuleStates(moduleStates);
 
   }
   
@@ -93,8 +94,12 @@ public class SwerveSubsystem extends SubsystemBase {
   public Rotation2d getRotation2d(){
     return new Rotation2d(getHeading());
   }
-  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    
-  }
+  public void setModuleStates(SwerveModuleState[] desiredStates) {
+    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, 5);
+    frontLeft.setDesiredState(desiredStates[0]);
+    frontRight.setDesiredState(desiredStates[1]);
+    backLeft.setDesiredState(desiredStates[2]);
+    backRight.setDesiredState(desiredStates[3]);
+}
 
 }

@@ -56,6 +56,6 @@ public final class Constants {
     //TEJA IS COOL
 
     //Change this
-    public static int rotJoystickPort = 1;
-    public static int transJoystickPort = 2;
+    public static int rotJoystickPort = 0;
+    public static int transJoystickPort = 1;
 }
