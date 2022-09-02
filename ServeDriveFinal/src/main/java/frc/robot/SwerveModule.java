@@ -1,14 +1,10 @@
 package frc.robot;
-import com.revrobotics.CANEncoder;
-import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.ControlType;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.controller.PIDController;
@@ -34,9 +30,6 @@ public class SwerveModule {
     public SwerveModule(int motorTransID, int motorRotID, int universalEncoderID,
      Boolean transInverted, Boolean rotInverted, double universalEncoderOffsetinit,
      Boolean universalEncoderInverted, boolean isAbsEncoder){
-        
-        resetEncoders();
-
         this.encoderInverted = universalEncoderInverted;
         this.isAbsoluteEncoder=isAbsEncoder;
         this.m_MotorTransID = motorTransID;
@@ -54,7 +47,7 @@ public class SwerveModule {
             universalEncoder = new AnalogInput(this.m_UniversalEncoderID);
         
         }
-        rotPID = new PIDController(Constants.kRotP,0,0);
+        rotPID = new PIDController(0.05,0,0);
         rotPID.enableContinuousInput(-Math.PI,Math.PI) ;
 
         transMotor.setInverted(this.m_transInverted);
@@ -62,11 +55,9 @@ public class SwerveModule {
 
         transEncoder = transMotor.getEncoder();
         rotEncoder = rotMotor.getEncoder();
+        System.out.println(transEncoder.getPosition());
 
-        rotEncoder.setPositionConversionFactor(Constants.angleEncoderConversionFactor);
-        rotEncoder.setVelocityConversionFactor(Constants.maxSpeed);
-        transEncoder.setPositionConversionFactor(Constants.driveEncoderConversionFactor);
-        transEncoder.setVelocityConversionFactor(Constants.maxSpeed);
+        rotEncoder.setPositionConversionFactor(2*Math.PI);
     }
     public double getTransPosition(){
         
@@ -79,7 +70,7 @@ public class SwerveModule {
         return transEncoder.getVelocity();
     }
     public double getRotVelocity(){
-        return transEncoder.getVelocity();
+        return rotEncoder.getVelocity();
     }
     public double getUniversalEncoderRad(){
         if (isAbsoluteEncoder) {
@@ -98,24 +89,8 @@ public class SwerveModule {
         
     }
     public void resetEncoders(){
-        try {
-            transEncoder.setPosition(1);
-        }
-        catch (Exception e){
-            System.out.println("Null pointer");
-        }
-        try{
-            if (isAbsoluteEncoder) {
-                rotEncoder.setPosition(getUniversalEncoderRad());
-            }
-        }
-
-
-        
-        catch(Exception e){
-            System.out.println(e);
-
-        }
+        transEncoder.setPosition(0);
+        rotEncoder.setPosition(0);
 
         //hello - 8/3/22
     }
@@ -123,9 +98,21 @@ public class SwerveModule {
         return new SwerveModuleState(getTransVelocity(),new Rotation2d(getRotPosition()));
     }
     public void setDesiredState(SwerveModuleState desiredState){
-        desiredState = SwerveModuleState.optimize(desiredState, getState().angle);
+        if (Math.abs(desiredState.speedMetersPerSecond) < 0.001) {
+            stop();
+            return;
+        }
+       desiredState = SwerveModuleState.optimize(desiredState, getState().angle);
+       SmartDashboard.putNumber("RotationPosition", getRotPosition());
+       SmartDashboard.putNumber("DesiredState", desiredState.angle.getRadians());
         transMotor.set(desiredState.speedMetersPerSecond/Constants.maxSpeed);
         rotMotor.set(rotPID.calculate(getRotPosition(),desiredState.angle.getRadians()));
+
     }
+    public void stop() {
+        transMotor.set(0);
+        rotMotor.set(0);
+    }
+    
 
 }

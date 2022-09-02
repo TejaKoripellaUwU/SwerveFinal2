@@ -9,6 +9,8 @@ package frc.robot;
 
 import com.revrobotics.CANSparkMax;
 
+import edu.wpi.first.math.util.Units;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants.  This class should not be used for any other purpose.  All constants should be
@@ -25,6 +27,14 @@ public final class Constants {
     public static final double maxSpeed = 12.0;
     public static final double wheelBaseX = 8;
     public static final double wheelBaseY = 9;
+    public static final double kPhysicalMaxSpeedMetersPerSecond = 5;
+    public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 2 * 2 * Math.PI;
+
+    public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond / 4;
+    public static final double kTeleDriveMaxAngularSpeedRadiansPerSecond = //
+            kPhysicalMaxAngularSpeedRadiansPerSecond / 4;
+    public static final double kTeleDriveMaxAccelerationUnitsPerSecond = 3;
+    public static final double kTeleDriveMaxAngularAccelerationUnitsPerSecond = 3;
     //Encoders
     public static final double angleEncoderConversionFactor = 20.00960392;
     public static final double driveEncoderConversionFactor = 1;
@@ -35,9 +45,12 @@ public final class Constants {
     public static final Gains fastPID = new Gains(0.05, 0.00001, 0.7, 0.0, 0.0, -1, 1, 1);
     public static final int swervePIDSlot = anglePIDFast.kSlot;
     public static final double PIDdiff = 1;
+    public static final double kTrackWidth = Units.inchesToMeters(21);
+    // Distance between right and left wheels
+    public static final double kWheelBase = Units.inchesToMeters(25.5);
 
     //JOYSTICK constants
-    public static final double deadzone = 0.05;
+    public static final double deadzone = 0.1;
 
     //SPARK ids
     public static final int frontLeftSteer = 13;
