@@ -35,18 +35,21 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 
 
 import com.kauailabs.navx.frc.AHRS;
+import com.revrobotics.SparkMaxPIDController;
+
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Gains;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.SwerveModule;
 
 public class SwerveSubsystem extends SubsystemBase {
-  private final SwerveModule frontLeft = new SwerveModule(Constants.frontLeftDrive, Constants.frontLeftSteer, 0,true, false,0,false, false);
-  private final SwerveModule frontRight = new SwerveModule(Constants.frontRightDrive, Constants.frontRightSteer,0,false,false,0,false, false);
-  private final SwerveModule backLeft = new SwerveModule(Constants.rearLeftDrive, Constants.rearLeftSteer,0,false,true,0,false, false);
-  private final SwerveModule backRight = new SwerveModule(Constants.rearRightDrive, Constants.rearRightSteer,0,false,false,0,false, false); 
+  private final SwerveModule frontLeft = new SwerveModule(Constants.frontLeftDrive, Constants.frontLeftSteer, 0,false, true,0,false, false);
+  private final SwerveModule frontRight = new SwerveModule(Constants.frontRightDrive, Constants.frontRightSteer,0,false,true,0,false, false);
+  private final SwerveModule backLeft = new SwerveModule(Constants.rearLeftDrive, Constants.rearLeftSteer,0,true,true,0,false, false);
+  private final SwerveModule backRight = new SwerveModule(Constants.rearRightDrive, Constants.rearRightSteer,0,false,true,0,false, false); 
   private final Joystick transJoystick;
   private final Joystick rotJoystick;
 
@@ -76,6 +79,8 @@ public class SwerveSubsystem extends SubsystemBase {
     frontRight.resetEncoders();
     backLeft.resetEncoders();
     backRight.resetEncoders();
+
+    SmartDashboard.putNumber("p", .05);
   }
   
 
@@ -91,13 +96,15 @@ public class SwerveSubsystem extends SubsystemBase {
 
     // 3. Make the driving smoother
     x = xLimiter.calculate(x) * Constants.kTeleDriveMaxSpeedMetersPerSecond;
-    y = yLimiter.calculate(y) * Constants.kTeleDriveMaxSpeedMetersPerSecond;
+    y = yLimiter.calculate(y) * Constants.kTeleDriveMaxSpeedMetersPerSecond*2;
     rot= turningLimiter.calculate(rot)
             * Constants.kTeleDriveMaxAngularSpeedRadiansPerSecond;
     ChassisSpeeds chassisSpeeds1 = new ChassisSpeeds(x, y, rot);
     SwerveModuleState[] moduleStates = m_kinematics.toSwerveModuleStates(chassisSpeeds1);
-    this.setModuleStates(moduleStates);
+    setAllPIDControllers(SmartDashboard.getNumber("p", 0.05));
+    
 
+    this.setModuleStates(moduleStates);
     SmartDashboard.putNumber("Module1ROT", moduleStates[0].angle.getRadians());
     SmartDashboard.putNumber("Module2ROT", moduleStates[1].angle.getRadians());
     SmartDashboard.putNumber("Module3ROT", moduleStates[2].angle.getRadians());
@@ -124,11 +131,18 @@ public class SwerveSubsystem extends SubsystemBase {
     return new Rotation2d(getHeading());
   }
   public void setModuleStates(SwerveModuleState[] desiredStates) {
+    
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.kTeleDriveMaxSpeedMetersPerSecond);
     frontLeft.setDesiredState(desiredStates[0]);
     frontRight.setDesiredState(desiredStates[1]);
     backLeft.setDesiredState(desiredStates[2]);
     backRight.setDesiredState(desiredStates[3]);
+}
+private void setAllPIDControllers(double p) {
+  frontRight.setPidController(p);
+  frontLeft.setPidController(p);
+  backRight.setPidController(p);
+  backLeft.setPidController(p);
 }
 
 }

@@ -1,9 +1,12 @@
 package frc.robot;
+import java.util.concurrent.locks.Condition;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -26,6 +29,7 @@ public class SwerveModule {
     private Boolean m_transInverted;
     private Boolean m_rotInverted;
     private Boolean encoderInverted;
+    private double ye;
 
     public SwerveModule(int motorTransID, int motorRotID, int universalEncoderID,
      Boolean transInverted, Boolean rotInverted, double universalEncoderOffsetinit,
@@ -55,16 +59,22 @@ public class SwerveModule {
 
         transEncoder = transMotor.getEncoder();
         rotEncoder = rotMotor.getEncoder();
-        System.out.println(transEncoder.getPosition());
 
+        
+        System.out.println(transEncoder.getPosition());
         rotEncoder.setPositionConversionFactor(2*Math.PI);
+        resetEncoders();
+        
     }
     public double getTransPosition(){
         
         return transEncoder.getPosition();
     }
     public double getRotPosition(){
-        return rotEncoder.getPosition();
+        double jesus = rotEncoder.getPosition()- (int)(rotEncoder.getPosition());
+        jesus = jesus * 2*Math.PI;
+        return jesus;
+    
     }
     public double getTransVelocity(){
         return transEncoder.getVelocity();
@@ -98,20 +108,26 @@ public class SwerveModule {
         return new SwerveModuleState(getTransVelocity(),new Rotation2d(getRotPosition()));
     }
     public void setDesiredState(SwerveModuleState desiredState){
-        if (Math.abs(desiredState.speedMetersPerSecond) < 0.001) {
-            stop();
-            return;
-        }
+        
+        
        desiredState = SwerveModuleState.optimize(desiredState, getState().angle);
        SmartDashboard.putNumber("RotationPosition", getRotPosition());
        SmartDashboard.putNumber("DesiredState", desiredState.angle.getRadians());
         transMotor.set(desiredState.speedMetersPerSecond/Constants.maxSpeed);
         rotMotor.set(rotPID.calculate(getRotPosition(),desiredState.angle.getRadians()));
+        System.out.println("setPoint is: "+ getRotPosition());
+
 
     }
     public void stop() {
         transMotor.set(0);
         rotMotor.set(0);
+    }
+    public PIDController getPIDController(){
+        return this.rotPID;
+    }
+    public void setPidController(double p){
+        rotPID.setP(p);
     }
     
 
