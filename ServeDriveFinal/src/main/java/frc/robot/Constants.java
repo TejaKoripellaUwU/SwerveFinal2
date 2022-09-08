@@ -27,7 +27,7 @@ public final class Constants {
     public static final double maxSpeed = 12.0;
     public static final double wheelBaseX = 8;
     public static final double wheelBaseY = 9;
-    public static final double kPhysicalMaxSpeedMetersPerSecond = 5;
+    public static final double kPhysicalMaxSpeedMetersPerSecond = 5; //40
     public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 2 * 2 * Math.PI;
     public static final double kTicksPerRotation = 42;
     public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond / 4;
