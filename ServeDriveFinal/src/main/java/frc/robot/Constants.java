@@ -50,9 +50,10 @@ public final class Constants {
     public static final int swervePIDSlot = anglePIDFast.kSlot;
     public static final double PIDdiff = 1;
     public static final double kTrackWidth = Units.inchesToMeters(21);
+    public static double tuningSetpoint = 0;
     // Distance between right and left wheels
     public static final double kWheelBase = Units.inchesToMeters(25.5);
-
+    public static final Boolean tuningPID = true;
     //JOYSTICK constants
     public static final double deadzone = 0.1;
 

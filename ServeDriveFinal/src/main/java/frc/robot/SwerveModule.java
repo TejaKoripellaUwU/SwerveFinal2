@@ -30,7 +30,7 @@ public class SwerveModule {
     private Boolean m_rotInverted;
     private Boolean encoderInverted;
     private double ye;
-    private Boolean tuningPID;
+   
 
     public SwerveModule(int motorTransID, int motorRotID, int universalEncoderID,
      Boolean transInverted, Boolean rotInverted, double universalEncoderOffsetinit,
@@ -43,8 +43,6 @@ public class SwerveModule {
         this.m_transInverted = transInverted;
         this.m_rotInverted = rotInverted;
         this.universalEncoderOffset = universalEncoderOffsetinit;
-
-        tuningPID = true;
         
         transMotor = new CANSparkMax(this.m_MotorTransID, MotorType.kBrushless);
         rotMotor = new CANSparkMax(this.m_MotorRotID, MotorType.kBrushless);
@@ -52,8 +50,6 @@ public class SwerveModule {
             universalEncoder = new AnalogInput(this.m_UniversalEncoderID);
         
         }
-        rotPID = new PIDController(0.00,0,0);
-        rotPID.enableContinuousInput(-Math.PI,Math.PI) ;
 
         transMotor.setInverted(this.m_transInverted);
         rotMotor.setInverted(this.m_rotInverted);
@@ -100,7 +96,7 @@ public class SwerveModule {
     }
     public void resetEncoders(){
         transEncoder.setPosition(0);
-        rotEncoder.setPosition(0);
+        rotEncoder.setPosition(0);// 
 
         //hello - 8/3/22
     }
@@ -112,8 +108,8 @@ public class SwerveModule {
             SmartDashboard.putNumber("RotationPosition", getRotPosition());
             SmartDashboard.putNumber("DesiredState", desiredState.angle.getRadians());
             transMotor.set(desiredState.speedMetersPerSecond/Constants.maxSpeed);
-            if (tuningPID) {
-                rotMotor.set(rotPID.calculate(getRotPosition(), .5));
+            if (Constants.tuningPID) {
+                rotMotor.set(rotPID.calculate(getRotPosition(), Constants.tuningSetpoint));
             } else {
                 rotMotor.set(rotPID.calculate(getRotPosition(),desiredState.angle.getRadians()));
             }
