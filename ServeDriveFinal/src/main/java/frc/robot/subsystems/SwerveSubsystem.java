@@ -72,8 +72,6 @@ public class SwerveSubsystem extends SubsystemBase {
     xLimiter = new SlewRateLimiter(Constants.kTeleDriveMaxAccelerationUnitsPerSecond);
     yLimiter = new SlewRateLimiter(Constants.kTeleDriveMaxAccelerationUnitsPerSecond);
     turningLimiter = new SlewRateLimiter(Constants.kTeleDriveMaxAngularAccelerationUnitsPerSecond);
-    rotPID = new PIDController(0.05,0,0);
-    rotPID.enableContinuousInput(-Math.PI,Math.PI);
     frontLeft.resetEncoders();
     frontRight.resetEncoders();
     backLeft.resetEncoders();
@@ -87,47 +85,55 @@ public class SwerveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    double x= transJoystick.getX();
-    double y = transJoystick.getY();
-    double rot = rotJoystick.getX();
-    boolean setPoimt = transJoystick.getRawButton(1);
-    if (transJoystick.getRawButton(5)){
-      Constants.tuningSetpoint+=Math.PI/2;
-    }else if(transJoystick.getRawButton(4)){
-      Constants.tuningSetpoint-=Math.PI/2;
+    if(Constants.tuningPID){
+      setAllPIDControllers(SmartDashboard.getNumber("p",0), SmartDashboard.getNumber("i", 0), SmartDashboard.getNumber("d", 0));
+      if (transJoystick.getRawButton(5)){
+        Constants.tuningSetpoint+=Math.PI/2;
+      }else if(transJoystick.getRawButton(4)){
+        Constants.tuningSetpoint-=Math.PI/2;
+      }
+      SmartDashboard.putNumber("setPointReal", Constants.tuningSetpoint);
+      frontLeft.updatePositions();
+      frontRight.updatePositions();
+      backLeft.updatePositions();
+      backRight.updatePositions();
     }
-    SmartDashboard.putNumber("setPointReal", Constants.tuningSetpoint);
-
-    x = Math.abs(x) > 0.15 ? x : 0.0;
-    y = Math.abs(y) > 0.15 ? y : 0.0;
-    rot = Math.abs(rot) > 0.05 ? rot : 0.0;
-    
-    // 3. Make the driving smoother
-    x = xLimiter.calculate(x) * Constants.kTeleDriveMaxSpeedMetersPerSecond;
-    y = yLimiter.calculate(y) * Constants.kTeleDriveMaxSpeedMetersPerSecond;
-    rot= turningLimiter.calculate(rot)
-            * Constants.kTeleDriveMaxAngularSpeedRadiansPerSecond;
-    ChassisSpeeds chassisSpeeds1 = new ChassisSpeeds(y,x, rot);
-    SwerveModuleState[] moduleStates = m_kinematics.toSwerveModuleStates(chassisSpeeds1);
-    setAllPIDControllers(SmartDashboard.getNumber("p",0.05), SmartDashboard.getNumber("i", 0), SmartDashboard.getNumber("d", 0));
+    else{
+      double x= transJoystick.getX();
+      double y = transJoystick.getY();
+      double rot = rotJoystick.getX();
   
-    SmartDashboard.putNumber("JOYSTICK Y", y);
-    this.setModuleStates(moduleStates);
-    
-    SmartDashboard.putNumber("Module1ROT", moduleStates[0].angle.getRadians());
-    SmartDashboard.putNumber("Module2ROT", moduleStates[1].angle.getRadians());
-    SmartDashboard.putNumber("Module3ROT", moduleStates[2].angle.getRadians());
-    SmartDashboard.putNumber("Module4ROT", moduleStates[3].angle.getRadians());
-    SmartDashboard.putNumber("Module1CurrentROT",frontLeft.getRotPosition());
-    SmartDashboard.putNumber("Module2CurrentROT", frontRight.getRotPosition());
-    SmartDashboard.putNumber("Module3CurrentROT", backLeft.getRotPosition());
-    SmartDashboard.putNumber("Module4CurrentROT", backRight.getRotPosition());
-
-    SmartDashboard.putNumber("ChassisSpeeds POT", chassisSpeeds1.omegaRadiansPerSecond);
-    SmartDashboard.putNumber("ChassisSpeed X", chassisSpeeds1.vxMetersPerSecond);
-    SmartDashboard.putNumber("ChassisSpeed Y", chassisSpeeds1.vyMetersPerSecond);
-
-
+  
+      x = Math.abs(x) > 0.15 ? x : 0.0;
+      y = Math.abs(y) > 0.15 ? y : 0.0;
+      rot = Math.abs(rot) > 0.05 ? rot : 0.0;
+      
+      // 3. Make the driving smoother
+      x = xLimiter.calculate(x) * Constants.kTeleDriveMaxSpeedMetersPerSecond;
+      y = yLimiter.calculate(y) * Constants.kTeleDriveMaxSpeedMetersPerSecond;
+      rot= turningLimiter.calculate(rot)
+              * Constants.kTeleDriveMaxAngularSpeedRadiansPerSecond;
+      ChassisSpeeds chassisSpeeds1 = new ChassisSpeeds(y,x, rot);
+      SwerveModuleState[] moduleStates = m_kinematics.toSwerveModuleStates(chassisSpeeds1);
+  
+      SmartDashboard.putNumber("JOYSTICK Y", y);
+      this.setModuleStates(moduleStates);
+      SmartDashboard.putNumber("Module1ROT", moduleStates[0].angle.getRadians());
+      SmartDashboard.putNumber("Module2ROT", moduleStates[1].angle.getRadians());
+      SmartDashboard.putNumber("Module3ROT", moduleStates[2].angle.getRadians());
+      SmartDashboard.putNumber("Module4ROT", moduleStates[3].angle.getRadians());
+      SmartDashboard.putNumber("Module1CurrentROT",frontLeft.getRotPosition());
+      SmartDashboard.putNumber("Module2CurrentROT", frontRight.getRotPosition());
+      SmartDashboard.putNumber("Module3CurrentROT", backLeft.getRotPosition());
+      SmartDashboard.putNumber("Module4CurrentROT", backRight.getRotPosition());
+  
+      SmartDashboard.putNumber("ChassisSpeeds POT", chassisSpeeds1.omegaRadiansPerSecond);
+      SmartDashboard.putNumber("ChassisSpeed X", chassisSpeeds1.vxMetersPerSecond);
+      SmartDashboard.putNumber("ChassisSpeed Y", chassisSpeeds1.vyMetersPerSecond);
+  
+  
+    }
+ 
   }
   
   public void resetGyro(){

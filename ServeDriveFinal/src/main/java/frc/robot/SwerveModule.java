@@ -29,7 +29,6 @@ public class SwerveModule {
     private Boolean m_transInverted;
     private Boolean m_rotInverted;
     private Boolean encoderInverted;
-    private double ye;
    
 
     public SwerveModule(int motorTransID, int motorRotID, int universalEncoderID,
@@ -60,6 +59,8 @@ public class SwerveModule {
         System.out.println(transEncoder.getPosition());
         rotEncoder.setPositionConversionFactor(2*Math.PI);
         resetEncoders();
+        rotPID = new PIDController(0.05, 0, 0);
+        rotPID.enableContinuousInput(-Math.PI, Math.PI);
         
     }
     public double getTransPosition(){
@@ -105,17 +106,16 @@ public class SwerveModule {
     }
     public void setDesiredState(SwerveModuleState desiredState){
         desiredState = SwerveModuleState.optimize(desiredState, getState().angle);
-            SmartDashboard.putNumber("RotationPosition", getRotPosition());
-            SmartDashboard.putNumber("DesiredState", desiredState.angle.getRadians());
-            transMotor.set(desiredState.speedMetersPerSecond/Constants.maxSpeed);
-            if (Constants.tuningPID) {
-                rotMotor.set(rotPID.calculate(getRotPosition(), Constants.tuningSetpoint));
-            } else {
-                rotMotor.set(rotPID.calculate(getRotPosition(),desiredState.angle.getRadians()));
-            }
+        SmartDashboard.putNumber("RotationPosition", getRotPosition());
+        SmartDashboard.putNumber("DesiredState", desiredState.angle.getRadians());
+        transMotor.set(desiredState.speedMetersPerSecond/Constants.maxSpeed);
+        rotMotor.set(rotPID.calculate(getRotPosition(),desiredState.angle.getRadians()));
         System.out.println("setPoint is: "+ getRotPosition());
 
 
+    }
+    public void updatePositions(){
+        rotMotor.set(rotPID.calculate(getRotPosition(), Constants.tuningSetpoint));
     }
     public void stop() {
         transMotor.set(0);
