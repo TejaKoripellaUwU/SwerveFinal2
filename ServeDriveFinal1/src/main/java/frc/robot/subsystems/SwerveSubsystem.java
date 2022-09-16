@@ -126,9 +126,12 @@ public class SwerveSubsystem extends SubsystemBase {
       SmartDashboard.putNumber("Module2CurrentROT", frontRight.getRotPosition());
       SmartDashboard.putNumber("Module3CurrentROT", backLeft.getRotPosition());
       SmartDashboard.putNumber("Module4CurrentROT", backRight.getRotPosition());
+  
       SmartDashboard.putNumber("ChassisSpeeds POT", chassisSpeeds1.omegaRadiansPerSecond);
       SmartDashboard.putNumber("ChassisSpeed X", chassisSpeeds1.vxMetersPerSecond);
       SmartDashboard.putNumber("ChassisSpeed Y", chassisSpeeds1.vyMetersPerSecond);
+  
+  
     }
  
   }
