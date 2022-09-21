@@ -8,41 +8,20 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.SPI.Port;
-
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.math.util.Units;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import javax.sound.sampled.SourceDataLine;
-
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.constraint.SwerveDriveKinematicsConstraint;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-
-
 import com.kauailabs.navx.frc.AHRS;
-import com.revrobotics.SparkMaxPIDController;
-
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Gains;
-import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.SwerveModule;
 
 public class SwerveSubsystem extends SubsystemBase {
@@ -143,7 +122,6 @@ public class SwerveSubsystem extends SubsystemBase {
     return new Rotation2d(getHeading());
   }
   public void setModuleStates(SwerveModuleState[] desiredStates) {
-    
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.kTeleDriveMaxSpeedMetersPerSecond);
     frontLeft.setDesiredState(desiredStates[0]);
     frontRight.setDesiredState(desiredStates[1]);
