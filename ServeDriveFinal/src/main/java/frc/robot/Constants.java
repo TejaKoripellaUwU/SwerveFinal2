@@ -69,7 +69,9 @@ public final class Constants {
 
     public static final int rearRightSteer = 15;
     public static final int rearRightDrive = 14;
-    public static final double kRotP = 0.005;
+    public static double kP = 0.000;
+    public static double kI = 0.000;
+    public static double kD = 0.000;
 
     //TEJA IS COOL
 

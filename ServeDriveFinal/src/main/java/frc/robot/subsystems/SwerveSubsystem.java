@@ -36,7 +36,6 @@ public class SwerveSubsystem extends SubsystemBase {
   private SlewRateLimiter yLimiter;
   private SlewRateLimiter turningLimiter;
   private SwerveDriveKinematics m_kinematics;
-  private PIDController rotPID;
 
   AHRS navx = new AHRS(Port.kMXP);
 
@@ -65,18 +64,22 @@ public class SwerveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     if(Constants.tuningPID){
-      setAllPIDControllers(SmartDashboard.getNumber("p",0), SmartDashboard.getNumber("i", 0), SmartDashboard.getNumber("d", 0));
-      if (transJoystick.getRawButton(5)){
-        Constants.tuningSetpoint+=Math.PI/2;
-      }else if(transJoystick.getRawButton(4)){
-        Constants.tuningSetpoint-=Math.PI/2;
+      if(Constants.kP != SmartDashboard.getNumber("p", 0) || Constants.kI != SmartDashboard.getNumber("i", 0) ||  Constants.kI != SmartDashboard.getNumber("i", 0))
+        setAllPIDControllers(SmartDashboard.getNumber("p",0), SmartDashboard.getNumber("i", 0), SmartDashboard.getNumber("d", 0));
+        Constants.kP = SmartDashboard.getNumber("p", 0);
+        Constants.kI = SmartDashboard.getNumber("i", 0);
+        Constants.kD = SmartDashboard.getNumber("d", 0);
+        if (transJoystick.getRawButton(5)){
+          Constants.tuningSetpoint+=Math.PI/2;
+        }else if(transJoystick.getRawButton(4)){
+          Constants.tuningSetpoint-=Math.PI/2;
+        }
+        SmartDashboard.putNumber("setPointReal", Constants.tuningSetpoint);
+        frontLeft.updatePositions();
+        frontRight.updatePositions();
+        backLeft.updatePositions();
+        backRight.updatePositions();
       }
-      SmartDashboard.putNumber("setPointReal", Constants.tuningSetpoint);
-      frontLeft.updatePositions();
-      frontRight.updatePositions();
-      backLeft.updatePositions();
-      backRight.updatePositions();
-    }
     else{
       double x= transJoystick.getX();
       double y = transJoystick.getY();
@@ -134,5 +137,21 @@ private void setAllPIDControllers(double p, double i, double d) {
   backRight.setPidController(p, i, d);
   backLeft.setPidController(p, i, d);
 }
-
+private void setAllP(double p) {
+  frontRight.getPIDController().setP(p);
+  frontLeft.getPIDController().setP(p);
+  backRight.getPIDController().setP(p);
+  backLeft.getPIDController().setP(p);
 }
+private void setAllI(double i) {
+  frontRight.getPIDController().setI(i);
+  frontLeft.getPIDController().setI(i);
+  backRight.getPIDController().setI(i);
+  backLeft.getPIDController().setI(i);
+}
+private void setAllD(double d){
+  frontRight.getPIDController().setD(d);
+  frontLeft.getPIDController().setD(d);
+  backRight.getPIDController().setD(d);
+  backLeft.getPIDController().setD(d);
+}}

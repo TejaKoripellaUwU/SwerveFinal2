@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.controller.PIDController;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 
@@ -117,7 +116,7 @@ public class SwerveModule {
 
     }
     public void updatePositions(){
-       rotPID.setReference(Constants.tuningSetpoint,ControlType.kPosition);
+       rotPID.setReference(Constants.tuningSetpoint/(2*Math.PI),ControlType.kPosition);
     }
     public void stop() {
         transMotor.set(0);
